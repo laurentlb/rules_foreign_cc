@@ -1,46 +1,70 @@
 tests = [
-    "//examples/cmake:test_libgd",
-    "//examples/cmake:test_libpng",
-    "//examples/cmake:test_zlib",
-    "//examples/cmake_cares:test_c_ares",
-    "//examples/cmake_hello_world_lib/static:test_hello",
-    "//examples/cmake_nghttp2:test_nghttp2",
-    "//examples/ninja:test_ninja_version",
-    "//test:cmake_script_test_suite",
-    "//examples/cc_configure_make:libevent_echosrv1",
+    "//cmake:test_libgd",
+    "//cmake:test_libpng",
+    "//cmake:test_zlib",
+    "//cmake_cares:test_c_ares",
+    "//cmake_cares:test_old_c_ares",
+    "//cmake_hello_world_lib/static:test_hello",
+    "//cmake_nghttp2:test_nghttp2",
+    #    "//built_ninja:test_ninja_version",
+    "@rules_foreign_cc//test:cmake_script_test_suite",
+    "@rules_foreign_cc//test:shell_script_conversion_suite",
+    "//cc_configure_make:libevent_echosrv1",
 ]
 
 test_suite(
     name = "tests",
     tests = tests + [
-        "//examples/cmake_synthetic:test_libs",
-        "//examples/configure_gnuplot:configure_libgd_tests",
-        "//examples/cmake_hello_world_lib/shared:test_libhello",
-        "//examples/cmake_hello_world_lib/binary:test_binary",
+        "//cmake_synthetic:test_libs",
+        "//configure_gnuplot:configure_libgd_tests",
+        "//cmake_hello_world_lib/shared:test_libhello",
+        "//cmake_hello_world_lib/binary:test_binary",
     ],
 )
 
 test_suite(
     name = "cmake_tests",
     tests = tests + [
-        "//examples/cmake_synthetic:test_libs",
-        "//examples/cmake_hello_world_lib/shared:test_libhello",
-        "//examples/cmake_hello_world_lib/binary:test_binary",
+        "//cmake_synthetic:test_libs",
+        "//cmake_hello_world_lib/shared:test_libhello",
+        "//cmake_hello_world_lib/binary:test_binary",
     ],
 )
 
 test_suite(
     name = "tests_no_synthetic",
-    tests = tests + ["//examples/configure_gnuplot:configure_libgd_tests"],
+    tests = tests + ["//configure_gnuplot:configure_libgd_tests"],
 )
 
 test_suite(
     name = "win_tests",
     tags = ["windows"],
     tests = tests + [
-        "//examples/cmake_synthetic:test_libs",
-        "//examples/configure_gnuplot:configure_libgd_tests",
-        "//examples/cmake_hello_world_lib/static:test_hello_ninja",
-        "//examples/cmake_hello_world_lib/static:test_hello_nmake",
+        "//cmake_synthetic:test_libs",
+        "//configure_gnuplot:configure_libgd_tests",
+        "//cmake_hello_world_lib/static:test_hello_ninja",
+        "//cmake_hello_world_lib/static:test_hello_nmake",
     ],
+)
+
+# On Bazel CI Mac machines, we are using cmake built from sources
+toolchain(
+    name = "built_cmake_toolchain",
+    exec_compatible_with = [
+        "@bazel_tools//platforms:osx",
+        "@bazel_tools//platforms:x86_64",
+    ],
+    toolchain = "@rules_foreign_cc//tools/build_defs/native_tools:built_cmake",
+    toolchain_type = "@rules_foreign_cc//tools/build_defs:cmake_toolchain",
+)
+
+# On Bazel CI Mac machines, we are using ninja built from sources
+toolchain(
+    name = "built_ninja_toolchain",
+    exec_compatible_with = [
+        "@bazel_tools//platforms:osx",
+        "@bazel_tools//platforms:x86_64",
+    ],
+    toolchain = "@rules_foreign_cc//tools/build_defs/native_tools:built_ninja",
+    toolchain_type = "@rules_foreign_cc//tools/build_defs:ninja_toolchain",
 )

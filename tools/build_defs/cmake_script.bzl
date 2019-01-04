@@ -1,11 +1,13 @@
 """ Contains all logic for calling CMake for building external libraries/binaries """
 
-load("@foreign_cc_platform_utils//:tools.bzl", "CMAKE_COMMAND")
 load(":cc_toolchain_util.bzl", "absolutize_path_in_str")
+
+CMAKE_COMMAND = "cmake"
 
 def create_cmake_script(
         workspace_name,
         target_os,
+        cmake_path,
         tools,
         flags,
         install_prefix,
@@ -38,8 +40,10 @@ def create_cmake_script(
     else:
         params = _create_crosstool_file_text(toolchain_dict, user_cache, user_env)
 
-    build_type = params.cache.get("CMAKE_BUILD_TYPE",
-                                  "DEBUG" if is_debug_mode else "RELEASE")
+    build_type = params.cache.get(
+        "CMAKE_BUILD_TYPE",
+        "DEBUG" if is_debug_mode else "RELEASE",
+    )
     params.cache.update({
         "CMAKE_PREFIX_PATH": merged_prefix_path,
         "CMAKE_INSTALL_PREFIX": install_prefix,
@@ -50,7 +54,7 @@ def create_cmake_script(
     str_cmake_cache_entries = " ".join(["-D" + key + "=\"" + params.cache[key] + "\"" for key in params.cache])
     cmake_call = " ".join([
         set_env_vars,
-        CMAKE_COMMAND,
+        cmake_path,
         str_cmake_cache_entries,
         " ".join(options),
         "$EXT_BUILD_ROOT/" + root,
@@ -177,9 +181,9 @@ def _move_dict_values(target, source, descriptor_map):
 
 def _fill_crossfile_from_toolchain(workspace_name, target_os, tools, flags):
     os_name = "Linux"
-    if target_os.is_win:
+    if target_os == "windows":
         os_name = "Windows"
-    if target_os.is_osx:
+    if target_os == "osx":
         os_name = "Apple"
     dict = {
         "CMAKE_SYSTEM_NAME": os_name,
