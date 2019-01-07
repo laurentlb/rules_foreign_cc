@@ -2,8 +2,8 @@ tests = [
     "//cmake:test_libgd",
     "//cmake:test_libpng",
     "//cmake:test_zlib",
-    "//cmake_cares:test_c_ares",
-    "//cmake_cares:test_old_c_ares",
+#    "//cmake_cares:test_c_ares",
+#    "//cmake_cares:test_old_c_ares",
     "//cmake_hello_world_lib/static:test_hello",
     "//cmake_nghttp2:test_nghttp2",
     # Commented out because the paths in shell test should be different depending on whether it called
